@@ -71,7 +71,7 @@ const HomeDisplay = () => {
 
             <motion.section variants={itemVariants} className="text-center flex justify-center items-center space-x-2 md:space-x-4">
               <ReachOutButton />
-              <p className="text-4xl md:text-5xl lg:text-7xl text-gray-600">INNOVATIVE</p>
+              <p className="text-4xl md:text-5xl lg:text-7xl text-gray-600">DIGITIZED</p>
             </motion.section>
 
             <motion.section variants={itemVariants} className="text-center">
