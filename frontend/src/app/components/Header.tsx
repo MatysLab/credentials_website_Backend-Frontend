@@ -1,6 +1,7 @@
 'use client';
 import React, { useState } from 'react';
-import ScrollToTopLink from '@/app/components/ScrollToTopLink';
+import gsap from "gsap";
+import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 
 import {
   Dialog,
@@ -28,11 +29,13 @@ import {
 
 // Data for menu items
 const callsToAction = [
-  { name: 'Contact Sales', href: '#', icon: PhoneIcon },
+  { name: 'Contact me: (438)-522-1540', href: '#', icon: PhoneIcon },
 ];
 
+gsap.registerPlugin(ScrollToPlugin);
+
 const products = [
-  { name: 'Cat or Dog', description: 'Cat vs Dog Image Classifier (TensorFlow).', href: '#', icon: ChartPieIcon },
+  { name: 'Cat or Dog', description: 'Cat vs Dog Image Classifier (TensorFlow).', href: '#classifier', icon: ChartPieIcon },
   { name: 'Engagement', description: 'Speak directly to your customers.', href: '#', icon: CursorArrowRaysIcon },
   { name: 'Security', description: 'Your customers data will be safe and secure.', href: '#', icon: FingerPrintIcon },
   { name: 'Integrations', description: 'Connect with third-party tools.', href: '#', icon: SquaresPlusIcon },
@@ -43,7 +46,7 @@ const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="bg-white shadow-md py-2 animate-slide-down fixed w-full z-50">
+    <header className="bg-white shadow-md py-2 animate-slide-down w-full z-50">
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 lg:px-8" aria-label="Global">
         {/* Logo Section */}
         <div className="flex lg:flex-1">
@@ -92,7 +95,17 @@ const Header = () => {
                         <item.icon className="h-6 w-6 text-gray-600 group-hover:text-blue-600" aria-hidden="true" />
                       </div>
                       <div className="flex-auto">
-                        <a href={item.href} className="block font-semibold text-gray-900 text-sm hover:text-blue-600">
+                        <a
+                            onClick={() => {
+                              setMobileMenuOpen(false); // optional, close menu
+                              gsap.to(window, {
+                                duration: 1,
+                                scrollTo: item.href,
+                                ease: "power2.inOut"
+                              });
+                            }}
+                            className="block font-semibold text-gray-900 text-sm hover:text-blue-600 cursor-pointer"
+                        >
                           {item.name}
                           <span className="absolute inset-0" />
                         </a>

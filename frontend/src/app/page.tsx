@@ -9,7 +9,7 @@ export default function Home() {
     <div className="bg-white items-center">
       <Header/>
       <HomeDisplay/>
-      <ClassifierProject/>
+        <ClassifierProject/>
       <FooterSection/>
     </div>
   );

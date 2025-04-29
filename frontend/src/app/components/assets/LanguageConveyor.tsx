@@ -31,8 +31,7 @@ const LanguageConveyor = () => {
       <div className="flex space-x-8 animate-scroll">
         {doubledLanguages.map((lang, index) => (
           <div key={index} className="flex flex-col items-center justify-center flex-shrink-8 w-full">
-            {/* Render the Devicon icon */}
-            <i className={`${lang.icon} text-6xl`} aria-hidden="true"></i>
+            <i className={`${lang.icon} text-5xl`} aria-hidden="true"></i>
             <span className="sr-only">{lang.name}</span>
           </div>
         ))}

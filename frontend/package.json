@@ -9,9 +9,11 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@gsap/react": "^2.1.2",
     "@headlessui/react": "^2.2.2",
     "@heroicons/react": "^2.2.0",
     "devicon": "^2.16.0",
+    "gsap": "^3.12.7",
     "lucide-react": "^0.503.0",
     "motion": "^12.9.2",
     "next": "15.3.1",
