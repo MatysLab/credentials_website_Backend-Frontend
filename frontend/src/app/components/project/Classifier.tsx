@@ -2,6 +2,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import axios from 'axios';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -52,46 +53,63 @@ const ClassifierProject = () => {
         return () => ctx.revert();
     }, [isMobile]);
 
-    const handleDrop = (e) => {
+    const [file, setFile] = useState(null);
+
+    const handleFileDrop = async (e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         setDragOver(false);
 
-        const files = e.dataTransfer.files;
-        if (files && files.length > 0) {
-            const file = files[0];
-            if (file.type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onloadend = () => {
-                    const img = new Image();
-                    img.onload = () => {
-                        const canvas = canvasRef.current;
-                        if (canvas) {
-                            const ctx = canvas.getContext('2d');
-                            if (ctx) {
-                                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                                let scale = 1;
-                                if (img.width > canvas.width) {
-                                    scale = canvas.width / img.width;
-                                }
-                                if (img.height > canvas.height) {
-                                    scale = Math.min(scale, canvas.height / img.height);
-                                }
+        const droppedFile = e.dataTransfer.files[0];
+        if (!droppedFile || !droppedFile.type.startsWith('image/')) {
+            alert("Please drop an image file.");
+            return;
+        }
 
-                                const imgWidth = img.width * scale;
-                                const imgHeight = img.height * scale;
-                                const x = (canvas.width - imgWidth) / 2;
-                                const y = (canvas.height - imgHeight) / 2;
-                                analyzeImage(file);
+        setFile(droppedFile);
 
-                            }
-                        }
-                    };
-                    img.src = reader.result;
-                };
-                reader.readAsDataURL(file);
-            } else {
-                alert("Please drop an image file.");
-            }
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = canvasRef.current;
+                if (!canvas) return;
+                const ctx = canvas.getContext('2d');
+                if (!ctx) return;
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                let scale = 1;
+                if (img.width > canvas.width) {
+                    scale = canvas.width / img.width;
+                }
+                if (img.height > canvas.height) {
+                    scale = Math.min(scale, canvas.height / img.height);
+                }
+
+                const imgWidth = img.width * scale;
+                const imgHeight = img.height * scale;
+                const x = (canvas.width - imgWidth) / 2;
+                const y = (canvas.height - imgHeight) / 2;
+
+                ctx.drawImage(img, x, y, imgWidth, imgHeight);
+                analyzeImage(droppedFile);
+            };
+        };
+        reader.readAsDataURL(droppedFile);
+
+        // Upload image
+        const formData = new FormData();
+        formData.append("file", droppedFile);
+
+        try {
+            const res = await axios.post('http://localhost:8080/upload', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            console.log('Upload successful:', res.data);
+        } catch (error) {
+            console.error("Upload failed:", error);
         }
     };
 
@@ -169,7 +187,7 @@ const ClassifierProject = () => {
                     onDragLeave={() => {
                         setDragOver(false);
                     }}
-                    onDrop={handleDrop}
+                    onDrop={handleFileDrop}
                     style={{
                         backgroundColor: dragOver ? 'rgba(107, 114, 128, 0.2)' : 'rgba(243, 244, 246, 1)',
                         borderStyle: dragOver ? 'dashed' : 'solid',
@@ -182,7 +200,8 @@ const ClassifierProject = () => {
                         width={isMobile ? 320 : 800}
                         height={isMobile ? 200 : 450}
                     />
-                    {!isAnalyzing && !dragOver && (
+
+                    {!isAnalyzing && (
                         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                             <div className="flex flex-col items-center text-center">
                                 <svg className="w-12 h-12 text-gray-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -191,7 +210,6 @@ const ClassifierProject = () => {
                                 <p className="text-sm text-gray-500">Drag and drop an image here</p>
                             </div>
 
-                            {/* Dog and Cat overlays can remain where they are if intended to be outside center */}
                             <img
                                 src="/dog.png"
                                 alt="Dog"
@@ -204,6 +222,7 @@ const ClassifierProject = () => {
                             />
                         </div>
                     )}
+
 
                     {isAnalyzing && (
                         <div className="absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center">
